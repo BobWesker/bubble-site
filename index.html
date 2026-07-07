@@ -2,76 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace Core</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #000000;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-        }
-
-        /* Ambient floating particle container configuration */
-        .bubble-wrapper {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-
-        .bubble {
-            position: absolute;
-            bottom: -50px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            animation: floatUp 12s infinite linear;
-        }
-
-        /* Clean staggered bubble variations */
-        .bubble:nth-child(1) { left: 10%; width: 40px; height: 40px; animation-duration: 8s; animation-delay: 0s; }
-        .bubble:nth-child(2) { left: 25%; width: 20px; height: 20px; animation-duration: 13s; animation-delay: 2s; }
-        .bubble:nth-child(3) { left: 40%; width: 55px; height: 55px; animation-duration: 10s; animation-delay: 1s; }
-        .bubble:nth-child(4) { left: 55%; width: 30px; height: 30px; animation-duration: 15s; animation-delay: 4s; }
-        .bubble:nth-child(5) { left: 70%; width: 45px; height: 45px; animation-duration: 9s; animation-delay: 0.5s; }
-        .bubble:nth-child(6) { left: 85%; width: 25px; height: 25px; animation-duration: 11s; animation-delay: 3s; }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-110vh) scale(1.2);
-                opacity: 0;
-            }
-        }
+        body { background-color: #000; margin: 0; overflow: hidden; height: 100vh; position: relative; }
+        video { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
+        .bubble-wrapper { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .bubble { position: absolute; bottom: -50px; background: rgba(255, 255, 255, 0.15); border-radius: 50%; animation: floatUp 10s infinite linear; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 100% { transform: translateY(-110vh); opacity: 0.5; } }
     </style>
 </head>
 <body>
 
+    <video id="webcam" autoplay playsinline></video>
+
     <div class="bubble-wrapper">
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
+        <div class="bubble" style="left: 10%; width: 40px; height: 40px; animation-delay: 0s;"></div>
+        <div class="bubble" style="left: 40%; width: 50px; height: 50px; animation-delay: 2s;"></div>
+        <div class="bubble" style="left: 70%; width: 30px; height: 30px; animation-delay: 4s;"></div>
     </div>
 
+    <script>
+        // This triggers the browser prompt immediately
+        async function requestCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('webcam').srcObject = stream;
+            } catch (err) {
+                console.error("Permission denied:", err);
+            }
+        }
+        
+        requestCamera();
+    </script>
 </body>
 </html>
