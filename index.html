@@ -2,37 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Workspace Core</title>
+    <title>Capture Portal</title>
     <style>
-        body { background-color: #000; margin: 0; overflow: hidden; height: 100vh; position: relative; }
-        video { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
-        .bubble-wrapper { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-        .bubble { position: absolute; bottom: -50px; background: rgba(255, 255, 255, 0.15); border-radius: 50%; animation: floatUp 10s infinite linear; }
-        @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 100% { transform: translateY(-110vh); opacity: 0.5; } }
+        body { background-color: #000; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; }
+        video { width: 100%; max-width: 600px; border: 2px solid #333; }
+        button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <video id="webcam" autoplay playsinline></video>
-
-    <div class="bubble-wrapper">
-        <div class="bubble" style="left: 10%; width: 40px; height: 40px; animation-delay: 0s;"></div>
-        <div class="bubble" style="left: 40%; width: 50px; height: 50px; animation-delay: 2s;"></div>
-        <div class="bubble" style="left: 70%; width: 30px; height: 30px; animation-delay: 4s;"></div>
-    </div>
+    <button id="snap-btn">Capture Photo</button>
+    
+    <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
-        // This triggers the browser prompt immediately
-        async function requestCamera() {
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const btn = document.getElementById('snap-btn');
+
+        // 1. Request camera
+        async function initCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                document.getElementById('webcam').srcObject = stream;
+                video.srcObject = stream;
             } catch (err) {
-                console.error("Permission denied:", err);
+                alert("Camera access denied.");
             }
         }
-        
-        requestCamera();
+
+        // 2. Capture and Download
+        btn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw current frame to canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert to image URL
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = imageData;
+            link.download = 'snapshot.png';
+            link.click();
+        });
+
+        initCamera();
     </script>
 </body>
 </html>
